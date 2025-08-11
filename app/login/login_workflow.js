@@ -69,12 +69,13 @@ loginWorkflow.login = async (username, req) => {
     const roles = decodedIdToken?.roles || []
     logger.info(`decodedIdToken : ${JSON.stringify(decodedIdToken)}`);
     if(roles.includes("Admin") || roles.includes("Staff")) {
-      const jwtToken = jwt.sign({name, username, roles}, 'SunsetRocksSecret', {expiresIn: '1h'});
+      const jwtToken = jwt.sign({name, username, roles}, config.auth.SECRET);
       apiResponse.data.token = jwtToken;
       let insertJwtTokenReq = {
-        sql: "insert into admin_active_users() values ()",
-        bindParams: [],
+        sql: "insert into admin_active_users(username,jwtToken) values (?,?)",
+        bindParams: [username,jwtToken],
       }
+      await commonModel.createRow(username, insertJwtTokenReq);
       return Promise.resolve(apiResponse);
     } else {
       apiResponse.meta.status = false;
@@ -94,7 +95,11 @@ loginWorkflow.logout = async (username, req) => {
   let apiResponse = createApiResponse(true,"User Logged out sucessfully.",200,{});
   try {
     logger.info(`{username}: ${filename}:${functionName}: Enter`);
-    // Remove the JWT token from the database table admin_active_users by matching req.JWTToken
+    let deleteJwtTokenReq = {
+      sql: "delete from admin_active_users where jwtToken= ?",
+      bindParams: [req.tokenName],
+    };
+    await commonModel.createRow(username, deleteJwtTokenReq);
   } catch (err) {
     logger.error(`${username}: ${filename}:${functionName}: Response Sent :`,err);
     apiResponse.meta.status = false;

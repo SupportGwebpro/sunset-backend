@@ -20,19 +20,19 @@
  const filename = "common-model";
  
  commonDB.getAllTableData = async ( username, request) => {
-   const functionName = "getAllTableData";
-   const successResponse = {
-     responseCode: 0,
-     response: [],
-     successMsg: "",
-   };
-   const failureResponse = {
-     responseCode: -1,
-     response: {},
-     errorMsg: "Something went wrong. Please Try Again Later",
-   };
-   let conn;
-   try {
+  const functionName = "getAllTableData";
+  const successResponse = {
+    responseCode: 0,
+    response: [],
+   successMsg: "",
+  };
+  const failureResponse = {
+    responseCode: -1,
+    response: {},
+    errorMsg: "Something went wrong. Please Try Again Later",
+  };
+  let conn;
+  try {
      conn = await sqlDb.doConnect(username);
      const sql = request.sql;
      const bindParams = request.bindParams;
@@ -50,8 +50,7 @@
      logger.error(`${username}: ${filename}:${functionName}: Response Sent : `, failureResponse);
      return Promise.reject(failureResponse);
    }
- };
- 
+};
  
  commonDB.createRow = async ( username, request) => {
    const functionName = "createRow";
@@ -118,36 +117,35 @@
    }
  };
  
- commonDB.createRowWithReturn = async ( username, request) => {
-   const functionName = "createRowWithReturn";
-   const successResponse = {
-     responseCode: 0,
-     response: {},
-     successMsg: "",
-   };
-   const failureResponse = {
-     responseCode: -1,
-     response: {},
-     errorMsg: "Something went wrong. Please Try Again Later",
-   };
-   
-   let conn;
-   try {
-     conn = await sqlDb.doConnect(username);
-     const sql = request.sql;
-     const bindParams = request.bindParams;
-     const rows = await sqlDb.executeSql(username,conn,sql,bindParams);
-     successResponse.response.returnParam = rows.insertId;
-     await sqlDb.doRelease(username, conn);
-     return Promise.resolve(successResponse);
-   } catch (err) {
-     logger.error(`${username}: ${filename}:${functionName}: Error Received : `, err);
-     await sqlDb.doRelease(username, conn);
-     failureResponse.errorMsg = err.message;
-     logger.error(`${username}: ${filename}:${functionName}: Response Sent : `, failureResponse);
-     return Promise.reject(failureResponse);
-   }
- };
+commonDB.createRowWithReturn = async ( username, request) => {
+  const functionName = "createRowWithReturn";
+  const successResponse = {
+    responseCode: 0,
+    response: {},
+    successMsg: "",
+  };
+  const failureResponse = {
+    responseCode: -1,
+    response: {},
+    errorMsg: "Something went wrong. Please Try Again Later",
+  };
+  let conn;
+  try {
+    conn = await sqlDb.doConnect(username);
+    const sql = request.sql;
+    const bindParams = request.bindParams;
+    const rows = await sqlDb.executeSql(username,conn,sql,bindParams);
+    successResponse.response = rows[0];
+    await sqlDb.doRelease(username, conn);
+    return Promise.resolve(successResponse);
+  } catch (err) {
+    logger.error(`${username}: ${filename}:${functionName}: Error Received : `, err);
+    await sqlDb.doRelease(username, conn);
+    failureResponse.errorMsg = err.message;
+    logger.error(`${username}: ${filename}:${functionName}: Response Sent : `, failureResponse);
+    return Promise.reject(failureResponse);
+  }
+};
  
  commonDB.updateTable = async ( username, request) => {
    const functionName = "updateTable";

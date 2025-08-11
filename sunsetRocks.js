@@ -27,6 +27,8 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 let server;
 const loginRoute = require("./routes/login/login_route");
+const eventRoute = require("./routes/event/event_route");
+const genericRoute = require("./routes/generic/generic_route");
 const path = require("path");
 const cors = require('cors');
 const fs = require('fs');
@@ -82,6 +84,8 @@ app.set("env", environment);
 
 // routes for User Case Rest Api 
 app.use("/", loginRoute);
+app.use("/", eventRoute);
+app.use("/", genericRoute);
 app.use(useragent.express());
 
 const startServer = () => {

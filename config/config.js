@@ -102,7 +102,7 @@ config.azureDetails = {
 };
 
 config.setting = {
-  backendendUrl: "https://72646cb3d829.ngrok-free.app"
+  backendendUrl: "https://sunset.sourcedeskit.ca"
 };
 
 module.exports = config;
