@@ -12,7 +12,7 @@ reqFilter.use(async function(req, res, next) {
   decodeURIComponent(req.url);
   const url = req.url.split("?")[0];
   const apiName = url.split("/")[3];
-  if(apiName == "login" || apiName == "getOutlookLoginUrl") {
+  if(apiName == "login" || apiName == "getOutlookLoginUrl" || apiName == "getEventCodeDetails" || apiName == "registerEvent") {
     next();
   } else if(req.headers.authorization  && req.headers.authorization != null  && req.headers.authorization != "null" && req.headers.authorization != "undefined")  {
     try{

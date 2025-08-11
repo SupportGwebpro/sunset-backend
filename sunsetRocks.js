@@ -29,6 +29,7 @@ let server;
 const loginRoute = require("./routes/login/login_route");
 const eventRoute = require("./routes/event/event_route");
 const genericRoute = require("./routes/generic/generic_route");
+const guestRoute = require("./routes/guests/guest_route");
 const path = require("path");
 const cors = require('cors');
 const fs = require('fs');
@@ -86,6 +87,7 @@ app.set("env", environment);
 app.use("/", loginRoute);
 app.use("/", eventRoute);
 app.use("/", genericRoute);
+app.use("/", guestRoute);
 app.use(useragent.express());
 
 const startServer = () => {

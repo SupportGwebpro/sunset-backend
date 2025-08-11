@@ -86,7 +86,14 @@ sqlDb.executeSql = async (userId, conn, sqlText, bindParameters = []) => {
     bindParameters.forEach((value, index) => {
       request.input(`param${index + 1}`, value);
     });
-    logger.info(`${userId}: Executing SQL : ${sqlText}`);
+    let debugSql = sqlText;
+    bindParameters.forEach((value, index) => {
+      let safeValue =
+        typeof value === "string" ? `'${value.replace(/'/g, "''")}'` : value;
+      debugSql = debugSql.replace(`@param${index + 1}`, safeValue);
+    });
+
+    logger.info(`${userId}: Executing SQL : ${debugSql}`);
     const result = await request.query(sqlText);
     return result.recordset;
   } catch (err) {

@@ -102,7 +102,8 @@ config.azureDetails = {
 };
 
 config.setting = {
-  backendendUrl: "https://sunset.sourcedeskit.ca"
+  backendendUrl: "https://sunset.sourcedeskit.ca",
+  frontendUrl: "https://sunset-fe.sourcedeskit.ca",
 };
 
 module.exports = config;
