@@ -45,7 +45,8 @@ eventRoute.post("/v1/admin/createEvent", async function(req, res) {
   await handleRequest(req, res, "createEvent", req.body.tokenUsername, eventWorkflow.createEvent);
 });
 
-eventRoute.post("/v1/admin/updateEvent", async function(req, res) {
+eventRoute.post("/v1/admin/updateEvent/:eventId", async function(req, res) {
+  req.body.eventId = req.params.eventId
   await handleRequest(req, res, "updateEvent", req.body.tokenUsername, eventWorkflow.updateEvent);
 });
 
