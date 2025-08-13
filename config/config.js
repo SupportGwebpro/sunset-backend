@@ -31,35 +31,35 @@ const config = {};
  */
 config.APP_VERSION = packageJson.version; // app version is read from package.json
 config.APP_TITLE = packageJson.description; // app title is read from package.json
-config.APP_STARTUP_FILE = "activate.js"; // start-up file, Don't change this configuration
+config.APP_STARTUP_FILE = "sunsetRocks.js"; // start-up file, Don't change this configuration
 
 config.SERVER = {
-  PORT: 9000, // Port that application server will run on. If this is changed, the Passenger command's --port parameter has to match this.
+  PORT: process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT,10) : 9000, // Port that application server will run on. If this is changed, the Passenger command's --port parameter has to match this.
   MIN_INSTANCES: 1, // Number of clusters the app will have. This should be (no. of CPU cores - 1), and the Passenger command's --min-instances parameter has to match this.
   MAX_POOL_SIZE: 10, // Maximum number of instances that will be maintained in a static pool, and the Passenger command's --max-pool-size parameter has to match this.
   FRIENDLY_ERROR_PAGES: false, // Set to `true` to show Passenger's friendly error page, which contains a lot of information that can help in debugging.
-  ENVIRONMENT: "production",
-  TIMEOUT: 0,
+  ENVIRONMENT: process.env.NODE_ENV || "production",
+  TIMEOUT: process.env.SERVER_TIMEOUT ? parseInt(process.env.SERVER_TIMEOUT,10) : 0,
 };
 
 (config.MSSQL = {
-  server: "sunset-rocks.database.windows.net",
-  user: "CloudSA03ab2b6b@sunset-rocks",
-  password: "Sunset-rocks",
-  database: "Sunset_DB",
+  server: process.env.MSSQL_SERVER || "sunset-rocks.database.windows.net",
+  user: process.env.MSSQL_USER || "CloudSA03ab2b6b@sunset-rocks",
+  password: process.env.MSSQL_PASSWORD ||"Sunset-rocks",
+  database: process.env.MSSQL_DATABASE || "Sunset_DB",
   options: {
-    encrypt: true,
-    trustServerCertificate: false
+    encrypt: process.env.MSSQL_ENCRYPT ? (process.env.MSSQL_ENCRYPT === "true") : true,
+    trustServerCertificate: process.env.MSSQL_TRUST_CERT === "true"
   },
   pool: {
-    max: 10,
+    max: process.env.MSSQL_POOL_MAX ? parseInt(process.env.MSSQL_POOL_MAX,10) : 10,
     min: 0,
-    idleTimeoutMillis: 30000
+    idleTimeoutMillis: process.env.MSSQL_POOL_IDLE ? parseInt(process.env.MSSQL_POOL_IDLE,10) : 30000
   }
 });
 
 config.LOG = {
-  FILENAME: "./logs/activate", // Main log file's path and name. `FORMAT` is appended to `FILENAME`.
+  FILENAME: "./logs/sunset", // Main log file's path and name. `FORMAT` is appended to `FILENAME`.
   FORMAT: "MMdd.log", // Date pattern in filename. Allowed tokens are yy, yyyy, M, MM, d, dd, H, HH, m, mm.
   PRETTY_PRINT: false, // Set to `true` if util.inspect should be used on metadata. Helps in debugging.
   CONSOLE_PRINT: false, // Set to `true` if output should also additionally be printed on console.
@@ -91,18 +91,19 @@ winston.add(require("winston-daily-rotate-file"), {
 
 config.logger = winston;
 
+config.SECRET = process.env.APP_SECRET || "B*#han560!usI"; 
 config.auth = {
-  SECRET: "B*#han&560!)usI"
+  SECRET: "B*#han560!usI"
 };
 
 config.azureDetails = {
-  azureTenantId: "b27e4987-a6db-4535-ba90-75df3e9b49a1",
-  azureClientId: "bce0ceed-5125-46fe-b8c2-655e51d8191a",
-  clientSecret: "SFf8Q~0q2YZydSbsV7n-D~IRGRnCr0bF8mLBEczS",
+  azureTenantId: process.env.AZURE_TENANT_ID || "b27e4987-a6db-4535-ba90-75df3e9b49a1",
+  azureClientId: process.env.AZURE_CLIENT_ID || "bce0ceed-5125-46fe-b8c2-655e51d8191a",
+  clientSecret: process.env.AZURE_CLIENT_SECRET || "SFf8Q~0q2YZydSbsV7n-D~IRGRnCr0bF8mLBEczS",
 };
 
 config.setting = {
-  backendendUrl: "https://sunset.sourcedeskit.ca",
+  backendendUrl: "https://sunsetrocks-backend-dev.azurewebsites.net",
   frontendUrl: "https://sunset-fe.sourcedeskit.ca",
 };
 

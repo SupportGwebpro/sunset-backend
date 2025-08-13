@@ -78,6 +78,67 @@ eventWorkflow.createEvent = async (username, req) => {
   }
 };
 
+eventWorkflow.updateEvent = async (username, req) => {
+  const functionName = "updateEvent"
+  let apiResponse = createApiResponse(true, "Event Updated Sucessfully", 200, {})
+  try {
+    logger.info(`${username}: ${filename}: ${functionName}: Enter`)
+    //Check Manadatory paramter exist
+    let checkManadatoryParamterExist = await genericWorkflow.checkManadatoryParamterExist(["eventId","eventName","eventDescription","eventStartDate","eventEndDate","eventRegClosingDate","eventTime","eventLocation","eventTermsAndCondition","eventMiscDetails","eventImageList"],req);
+    if (!checkManadatoryParamterExist.validation) {
+      apiResponse.meta.status = false;
+      apiResponse.meta.message = checkManadatoryParamterExist.message;
+      return Promise.reject(apiResponse);
+    } else if(req.eventImageList.length === 0) {
+      apiResponse.meta.status = false;
+      apiResponse.meta.message = "Require atleast one image to create an event";
+      return Promise.reject(apiResponse);
+    }
+
+    // Checking event exists or not
+    const checkEventExistsReq = {
+      sql: "SELECT eventId FROM event_details WHERE eventId = ?",
+      bindParams: [req.eventId]
+    }
+    let checkEventExists = await commonModel.getAllTableData(username, checkEventExistsReq)
+    if (checkEventExists.response.length === 0) {
+      apiResponse.meta.status = false;
+      apiResponse.meta.message = "Event not found"
+      return Promise.reject(apiResponse)
+    }
+
+    //Updating event details
+    const updateEventReq = {
+      sql: "UPDATE event_details SET eventName = ?, eventDescription = ?, eventStartDate = ?, eventEndDate = ?, eventRegClosingDate = ?, eventTime = ?, eventLocation = ?, eventTermsAndCondition = ?, eventMiscDetails = ? WHERE eventId = ?",
+      bindParams: [req.eventName, req.eventDescription, req.eventStartDate, req.eventEndDate, req.eventRegClosingDate, req.eventTime, req.eventLocation, req.eventTermsAndCondition, req.eventMiscDetails, req.eventId]
+    }
+    await commonModel.updateTable(username, updateEventReq)
+
+    //Deleting existing image
+    const deleteEventImagesReq = {
+      sql: "DELETE FROM event_images WHERE eventId = ?",
+      bindParams: [req.eventId]
+    }
+    await commonModel.deleteTable(username, deleteEventImagesReq)
+
+    // Inserting updated event images
+    for (let image of req.eventImageList) {
+      const insertEventImageReq = {
+        sql: "INSERT INTO event_images(eventId,imageUrl) VALUES (?,?)",
+        bindParams: [req.eventId, image]
+      }
+      await commonModel.createRow(username, insertEventImageReq)
+    }
+
+    return Promise.resolve(apiResponse)
+  } catch (error) {
+    logger.error(`${username}: ${filename}:${functionName}: Response Sent :`,error);
+    apiResponse.meta.status = false;
+    apiResponse.meta.message = "Server Error";
+    return Promise.reject(apiResponse);
+  }
+};
+
 eventWorkflow.getAllEvents = async (username, req) => {
   const functionName = "getAllEvents";
   let apiResponse = createApiResponse(true,"",200,{});
